@@ -75,6 +75,7 @@
           contactFormUtils.clearForm();
         },
         error: function(response) {
+			console.log(response);
           contactFormUtils.addAjaxMessage(response.responseJSON.message, true);
         },
         complete: function() {

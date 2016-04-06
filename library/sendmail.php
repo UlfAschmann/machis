@@ -17,6 +17,7 @@
   function constructMessageBody () {
     $fields_req =  array("name" => true, "email" => true, "message" => true);
     $message_body = "";
+	$message_body = "Producto: ".$_POST['reason']."\n";
     foreach ($fields_req as $name => $required) {
       $postedValue = $_POST[$name];
       if ($required && empty($postedValue)) {
@@ -31,12 +32,22 @@
   header('Content-type: application/json');
 
   //do Captcha check, make sure the submitter is not a robot:)...
+  //Variables para el captcha
+	$FEEDBACK_HOSTNAME 		= "smtp.gmail.com";
+	$FEEDBACK_EMAIL 		= "contacto.mcachis@gmail.com";
+	$FEEDBACK_PASSWORD 		= "mcachis2016";
+	$FEEDBACK_ENCRYPTION	= "TLS";
+	$RECAPTCHA_SECRET_KEY 	= "6LduihoTAAAAAF5FA2XO08wLl2MNTOW_ilH_8SiK";//Cambiar cuando se suba
+	$SEND_EMAIL_1			= "a.chiquet@mcachis.com.mx";
+	$SEND_EMAIL_2			= "a.velasco@mcachis.com.mx";
+	$FEEDBACK_SKIP_AUTH 	= false;
+	
   $url = 'https://www.google.com/recaptcha/api/siteverify';
   $opts = array('http' =>
     array(
       'method'  => 'POST',
       'header'  => 'Content-type: application/x-www-form-urlencoded',
-      'content' => http_build_query(array('secret' => getenv('RECAPTCHA_SECRET_KEY'), 'response' => $_POST["g-recaptcha-response"]))
+      'content' => http_build_query(array('secret' => $RECAPTCHA_SECRET_KEY, 'response' => $_POST["g-recaptcha-response"]))
     )
   );
   $context  = stream_context_create($opts);
@@ -51,31 +62,33 @@
   $mail = new PHPMailer;
   $mail->CharSet = 'UTF-8';
   $mail->isSMTP();
-  $mail->Host = getEnv('FEEDBACK_HOSTNAME');
-  if (!getenv('FEEDBACK_SKIP_AUTH')) {
+  $mail->Host = $FEEDBACK_HOSTNAME;
+  if (!$FEEDBACK_SKIP_AUTH) {
     $mail->SMTPAuth = true;
-    $mail->Username = getenv('FEEDBACK_EMAIL');
-    $mail->Password = getenv('FEEDBACK_PASSWORD');
+    $mail->Username = $FEEDBACK_EMAIL;
+    $mail->Password = $FEEDBACK_PASSWORD;
   }
-  if (getenv('FEEDBACK_ENCRYPTION') == 'TLS') {
+  if ($FEEDBACK_ENCRYPTION == 'TLS') {
     $mail->SMTPSecure = 'tls';
     $mail->Port = 587;
-  } elseif (getenv('FEEDBACK_ENCRYPTION') == 'SSL') {
+  } elseif ($FEEDBACK_ENCRYPTION == 'SSL') {
     $mail->SMTPSecure = 'ssl';
     $mail->Port = 465;
   }
 
-  $mail->Sender = getenv('FEEDBACK_EMAIL');
+  $mail->Sender = $FEEDBACK_EMAIL;
   $mail->setFrom($_POST['email'], $_POST['name']);
-  $mail->addAddress(getenv('FEEDBACK_EMAIL'));
+  $mail->addAddress($SEND_EMAIL_1);
+  $mail->addAddress($SEND_EMAIL_2);
 
-  $mail->Subject = $_POST['reason'];
+  //$mail->Subject = $_POST['reason'];
+  $mail->Subject = $_POST['name'];
   $mail->Body  = $messageBody;
 
 
   //try to send the message
   if($mail->send()) {
-    echo json_encode(array('message' => 'Your message was successfully submitted.'));
+    echo json_encode(array('message' => 'Hemos recibido tu mensaje, en breve nos comunicaremos contigo.'));
   } else {
     errorResponse('An expected error occured while attempting to send the email: ' . $mail->ErrorInfo);
   }
