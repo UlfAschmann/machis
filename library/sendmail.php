@@ -17,7 +17,7 @@
   function constructMessageBody () {
     $fields_req =  array("name" => true, "email" => true, "message" => true);
     $message_body = "";
-	$message_body = "Producto: ".$_POST['reason']."\n";
+     $message_body = "Producto: ".$_POST['reason']."\n";
     foreach ($fields_req as $name => $required) {
       $postedValue = $_POST[$name];
       if ($required && empty($postedValue)) {
@@ -33,15 +33,15 @@
 
   //do Captcha check, make sure the submitter is not a robot:)...
   //Variables para el captcha
-	$FEEDBACK_HOSTNAME 		= "smtp.gmail.com";
-	$FEEDBACK_EMAIL 		= "contacto.mcachis@gmail.com";
-	$FEEDBACK_PASSWORD 		= "mcachis2016";
-	$FEEDBACK_ENCRYPTION	= "TLS";
-	$RECAPTCHA_SECRET_KEY 	= "6LduihoTAAAAAF5FA2XO08wLl2MNTOW_ilH_8SiK";//Cambiar cuando se suba
-	$SEND_EMAIL_1			= "a.chiquet@mcachis.com.mx";
-	$SEND_EMAIL_2			= "a.velasco@mcachis.com.mx";
-	$FEEDBACK_SKIP_AUTH 	= false;
-	
+     $FEEDBACK_HOSTNAME 		= "smtp.gmail.com";
+     $FEEDBACK_EMAIL 		= "contacto.mcachis@gmail.com";
+     $FEEDBACK_PASSWORD 		= "mcachis2016";
+     $FEEDBACK_ENCRYPTION	= "TLS";
+     $RECAPTCHA_SECRET_KEY 	= "6Ld_xxwTAAAAAKNnE8M5CTG-_qPgFpTh3_fJpwPj";//Cambiar cuando se suba
+     $SEND_EMAIL_1			= "a.chiquet@mcachis.com.mx";
+     $SEND_EMAIL_2			= "a.velasco@mcachis.com.mx";
+     $FEEDBACK_SKIP_AUTH 	= false;
+
   $url = 'https://www.google.com/recaptcha/api/siteverify';
   $opts = array('http' =>
     array(
