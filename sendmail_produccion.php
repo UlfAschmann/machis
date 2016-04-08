@@ -1,11 +1,5 @@
 <?php
-  /**
-   * Sets error header and json error message response.
-   *
-   * @param  String $messsage error message of response
-   * @return void
-   */
-  function errorResponse ($messsage) {
+ function errorResponse ($messsage) {
     header('HTTP/1.1 500 Internal Server Error');
     die(json_encode(array('message' => $messsage)));
   }
@@ -29,18 +23,17 @@
     return $message_body;
   }
 
-  header('Content-type: application/json');
+header('Content-type: application/json');
 
   //do Captcha check, make sure the submitter is not a robot:)...
   //Variables para el captcha
-     $FEEDBACK_HOSTNAME 		= "smtp.exchangeadministrado.com";
+     $FEEDBACK_HOSTNAME 		= "smtp.gmail.com";
      $FEEDBACK_EMAIL 		= "contacto.mcachis@gmail.com";
      $FEEDBACK_PASSWORD 		= "mcachis2016";
-     $FEEDBACK_ENCRYPTION	= "SSL";
+     $FEEDBACK_ENCRYPTION	= "TLS";
      $RECAPTCHA_SECRET_KEY 	= "6Ld_xxwTAAAAAKNnE8M5CTG-_qPgFpTh3_fJpwPj";//Cambiar cuando se suba
-     //$SEND_EMAIL_1			= "a.chiquet@mcachis.com.mx";
-     //$SEND_EMAIL_2			= "a.velasco@mcachis.com.mx";
-     $SEND_EMAIL_1 = "ulf.aschmann@gmail.com";
+     $SEND_EMAIL_1			= "a.chiquet@mcachis.com.mx";
+     $SEND_EMAIL_2			= "a.velasco@mcachis.com.mx";
      $FEEDBACK_SKIP_AUTH 	= false;
 
   $url = 'https://www.google.com/recaptcha/api/siteverify';
@@ -57,40 +50,21 @@
   if (!$result->success) {
     errorResponse('reCAPTCHA checked failed! Error codes: ' . join(', ', $result->{"error-codes"}));
   }
-  //attempt to send email
-  $messageBody = constructMessageBody();
-  require './vender/php_mailer/PHPMailerAutoload.php';
-  $mail = new PHPMailer;
-  $mail->CharSet = 'UTF-8';
-  $mail->isSMTP();
-  $mail->Host = $FEEDBACK_HOSTNAME;
-  if (!$FEEDBACK_SKIP_AUTH) {
-    $mail->SMTPAuth = true;
-    $mail->Username = $FEEDBACK_EMAIL;
-    $mail->Password = $FEEDBACK_PASSWORD;
-  }
-  if ($FEEDBACK_ENCRYPTION == 'TLS') {
-    $mail->SMTPSecure = 'tls';
-    $mail->Port = 587;
-  } elseif ($FEEDBACK_ENCRYPTION == 'SSL') {
-    $mail->SMTPSecure = 'ssl';
-    $mail->Port = 587;
-  }
 
-  $mail->Sender = $FEEDBACK_EMAIL;
-  $mail->setFrom($_POST['email'], $_POST['name']);
-  $mail->addAddress($SEND_EMAIL_1);
-  //$mail->addAddress($SEND_EMAIL_2);
-
-  //$mail->Subject = $_POST['reason'];
-  $mail->Subject = $_POST['name'];
-  $mail->Body  = $messageBody;
+$messageBody = constructMessageBody();
+$para      = $SEND_EMAIL_1 . "," . $SEND_EMAIL_2;
+$titulo    = $_POST['name'];
+$mensaje   = $messageBody;
+$cabeceras = 'From: contacto.mcachis@gmail.com' . "\r\n" .
+   'Reply-To: contacto.mcachis@gmail.com' . "\r\n" .
+   'X-Mailer: PHP/' . phpversion();
 
 
   //try to send the message
-  if($mail->send()) {
+  if(mail($para, $titulo, $mensaje, $cabeceras)) {
     echo json_encode(array('message' => 'Hemos recibido tu mensaje, en breve nos comunicaremos contigo.'));
   } else {
     errorResponse('An expected error occured while attempting to send the email: ' . $mail->ErrorInfo);
   }
+
 ?>
